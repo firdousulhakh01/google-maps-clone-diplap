@@ -12,5 +12,5 @@ export default function ButtonUsage() {
     console.log("IntroUseEffect");
     return () => clearTimeout(timer);
   }, [navigate]);
-  return <h1>IntroPage...</h1>;
+  return <h1>IntroPage coming...</h1>;
 }

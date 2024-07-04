@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import { CssBaseline } from "@mui/material";
 
-import Dummy from "./Components/Others/Dummy";
+import IntroPage from "./Components/IntroPage";
 import SignInPage from "./Components/SignInPage";
 import SignUpPage from "./Components/SignUpPage";
 import Home from "./Components/Home";
@@ -19,7 +19,7 @@ const App = () => {
             path="/"
             element={
               <Home>
-                <Dummy />
+                <IntroPage />
               </Home>
             }
           />

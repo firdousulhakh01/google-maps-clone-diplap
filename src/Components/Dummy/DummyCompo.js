@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { auth } from "../Firebase/config";
-import { useNavigate } from "react-router-dom";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -9,35 +7,37 @@ import {
   OverlayView,
 } from "@react-google-maps/api";
 
+const containerStyle = {
+  width: "100%",
+  height: "400px",
+};
+
+const defaultCenter = {
+  lat: 40.712776,
+  lng: -74.005974,
+};
+
 const MapComponent = () => {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: "YOUR_API_KEY_HERE",
     libraries: ["places"],
   });
-  const navigate = useNavigate();
+
   const [map, setMap] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
-  const [markerPosition, setMarkerPosition] = useState({});
+  const [markerPosition, setMarkerPosition] = useState(defaultCenter);
   const [photoUrl, setPhotoUrl] = useState("");
   const [searchHistory, setSearchHistory] = useState(() => {
     const history = localStorage.getItem("searchHistory");
     return history ? JSON.parse(history) : [];
   });
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-  console.log(markerPosition, "test");
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef(null);
+
   useEffect(() => {
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
   }, [searchHistory]);
-  const [inputValue, setInputValue] = useState("");
-  const inputRef = useRef(null);
-  useEffect(() => {
-    console.log("OK");
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        setMarkerPosition({ lat: latitude, lng: longitude });
-      }
-    );
-  }, []);
 
   const onLoad = (autoC) => {
     setAutocomplete(autoC);
@@ -46,7 +46,6 @@ const MapComponent = () => {
   const onPlaceChanged = () => {
     if (autocomplete !== null) {
       const place = autocomplete.getPlace();
-      console.log(place, "api details");
       const location = place.geometry?.location;
       if (location) {
         const newPlace = {
@@ -74,18 +73,11 @@ const MapComponent = () => {
       console.log("Autocomplete is not loaded yet!");
     }
   };
-  const handleLogOut = async () => {
-    try {
-      await auth.signOut();
-      localStorage.clear();
-      navigate("/sign-in");
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+
   const onMapLoad = (map) => {
     setMap(map);
   };
+
   const handleDeleteHistory = (description) => {
     setSearchHistory((prev) =>
       prev.filter((place) => place.description !== description)
@@ -105,15 +97,18 @@ const MapComponent = () => {
       autocomplete.setTypes(["establishment"]);
     }
   };
+
   const toggleHistory = () => {
     setIsHistoryVisible(!isHistoryVisible);
   };
+
   const handleClearInput = () => {
     setInputValue("");
     if (autocomplete) {
       autocomplete.setFields([]);
     }
   };
+
   if (loadError) {
     return <div>Map cannot be loaded right now, please try again later.</div>;
   }
@@ -152,45 +147,18 @@ const MapComponent = () => {
             onClick={handleClearInput}
             style={{
               position: "absolute",
-              left: "69%",
-              marginLeft: "-130px",
-              top: "15px",
-              zIndex: "10",
-              height: "25px",
+              right: "0",
+              top: "0",
+              height: "100%",
               border: "none",
-              color: "white",
-              backgroundColor: "blue",
+              background: "transparent",
+              cursor: "pointer",
             }}
           >
-            clear
+            ✖
           </button>
         </div>
       </Autocomplete>
-      <div
-        style={{
-          boxSizing: `border-box`,
-          border: `1px solid transparent`,
-          width: `48px`,
-          height: `32px`,
-          padding: `0 12px`,
-          borderRadius: `3px`,
-          fontSize: `14px`,
-          outline: `none`,
-          textOverflow: `ellipsis`,
-          position: "absolute",
-          left: "50%",
-          marginLeft: "-200px",
-          top: "13px",
-          zIndex: "10",
-        }}
-      >
-        <button
-          style={{ backgroundColor: "orange", color: "white", padding: "5px" }}
-          onClick={handleLogOut}
-        >
-          LogOut
-        </button>
-      </div>
       <button
         onClick={toggleHistory}
         style={{
@@ -241,12 +209,9 @@ const MapComponent = () => {
         </div>
       )}
       <GoogleMap
-        mapContainerStyle={{
-          width: "100%",
-          height: "100vh",
-        }}
+        mapContainerStyle={containerStyle}
         center={markerPosition}
-        zoom={14}
+        zoom={10}
         onLoad={onMapLoad}
       >
         <Marker position={markerPosition} />

@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC87s7F-N_eBj2sOg_QWN9FHC6MnxJdyLU",
-  authDomain: "machine-test-54fbb.firebaseapp.com",
-  projectId: "machine-test-54fbb",
-  storageBucket: "machine-test-54fbb.appspot.com",
-  messagingSenderId: "171361617720",
-  appId: "1:171361617720:web:09162f53c8f35882d3e3cd",
+  apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
 };
 
 const firebase = initializeApp(firebaseConfig);

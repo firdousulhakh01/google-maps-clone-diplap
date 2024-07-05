@@ -10,30 +10,26 @@ import {
 } from "@react-google-maps/api";
 
 const MapComponent = () => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"],
-  });
-  const navigate = useNavigate();
   const [map, setMap] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
   const [markerPosition, setMarkerPosition] = useState({});
   const [photoUrl, setPhotoUrl] = useState("");
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [searchHistory, setSearchHistory] = useState(() => {
     const history = localStorage.getItem("searchHistory");
     return history ? JSON.parse(history) : [];
   });
-  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+
   const inputRef = useRef(null);
-  console.log(markerPosition, "test");
+  const navigate = useNavigate();
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
 
   useEffect(() => {
-    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-  }, [searchHistory]);
-
-  useEffect(() => {
-    console.log("OK");
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
         setMarkerPosition({ lat: latitude, lng: longitude });
@@ -41,14 +37,20 @@ const MapComponent = () => {
     );
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+  }, [searchHistory]);
+
   const onLoad = (autoC) => {
     setAutocomplete(autoC);
+    // console.log(autocomplete, "onload");
   };
 
   const onPlaceChanged = () => {
     if (autocomplete !== null) {
       const place = autocomplete.getPlace();
-      console.log(place, "api details");
+      // console.log(place, "api details");
+
       const location = place.geometry?.location;
       if (location) {
         const newPlace = {
@@ -76,6 +78,11 @@ const MapComponent = () => {
       console.log("Autocomplete is not loaded yet!");
     }
   };
+
+  const onMapLoad = (map) => {
+    setMap(map);
+  };
+
   const handleLogOut = async () => {
     try {
       await auth.signOut();
@@ -85,9 +92,7 @@ const MapComponent = () => {
       console.log(error.message);
     }
   };
-  const onMapLoad = (map) => {
-    setMap(map);
-  };
+
   const handleDeleteHistory = (description) => {
     setSearchHistory((prev) =>
       prev.filter((place) => place.description !== description)
@@ -107,18 +112,22 @@ const MapComponent = () => {
       autocomplete.setTypes(["establishment"]);
     }
   };
+
   const toggleHistory = () => {
     setIsHistoryVisible(!isHistoryVisible);
   };
+
   const handleClearInput = () => {
     setInputValue("");
     if (autocomplete) {
       autocomplete.setFields([]);
     }
   };
+
   const handleHistoryItemClick = (description) => {
     setInputValue(description);
   };
+
   if (loadError) {
     return <div>Map cannot be loaded right now, please try again later.</div>;
   }
@@ -193,6 +202,7 @@ const MapComponent = () => {
         )}
         <button onClick={handleClearInput}>clear</button>
       </div>
+
       {isHistoryVisible && searchHistory.length > 0 && (
         <div
           className="search-history"
@@ -234,6 +244,7 @@ const MapComponent = () => {
           ))}
         </div>
       )}
+
       <GoogleMap
         mapContainerStyle={{
           width: "100%",
@@ -249,6 +260,7 @@ const MapComponent = () => {
         }}
       >
         <Marker position={markerPosition} />
+
         {photoUrl && (
           <OverlayView
             position={markerPosition}

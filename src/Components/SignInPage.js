@@ -1,6 +1,6 @@
-import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../Firebase/config";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -18,15 +18,17 @@ const defaultTheme = createTheme();
 
 const SignInPage = () => {
   const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
     const password = data.get("password");
+
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user, "in");
+
         if (user.emailVerified) {
           navigate("/user");
           localStorage.setItem("status", true);
@@ -42,7 +44,6 @@ const SignInPage = () => {
         }
       })
       .catch((error) => {
-        console.log(error.message);
         toast.error(error.message, {
           position: "bottom-center",
           autoClose: 3000,
@@ -75,7 +76,7 @@ const SignInPage = () => {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            noValidate
+            // noValidate
             sx={{ mt: 1 }}
           >
             <TextField
@@ -98,7 +99,6 @@ const SignInPage = () => {
               id="password"
               autoComplete="current-password"
             />
-
             <Button
               type="submit"
               fullWidth
@@ -115,7 +115,7 @@ const SignInPage = () => {
                 variant="body2"
                 sx={{ textDecoration: "none" }}
               >
-                {"Sign Up"}
+                Sign Up
               </Link>
             </Box>
           </Box>

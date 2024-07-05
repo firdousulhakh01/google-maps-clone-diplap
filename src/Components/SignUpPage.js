@@ -23,6 +23,7 @@ const defaultTheme = createTheme();
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -30,20 +31,25 @@ const SignUpPage = () => {
     const password = data.get("password");
     const fName = data.get("firstName");
     const lName = data.get("lastName");
+
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user, "up");
+
         if (user) {
           setDoc(doc(db, "Users", user.uid), {
             email: email,
             firstName: fName,
             lastName: lName,
           });
-        } else console.log("ErrorSignUpPage");
+        } else {
+          console.log("ErrorSignUpPage");
+        }
+
         setTimeout(() => {
           navigate("/sign-in");
         }, 3500);
+
         toast.success(
           "Account created successfully and verifying mail has send",
           {
@@ -55,6 +61,7 @@ const SignUpPage = () => {
             draggable: false,
           }
         );
+
         sendEmailVerification(user);
       })
       .catch((error) => {
@@ -66,7 +73,6 @@ const SignUpPage = () => {
           pauseOnHover: true,
           draggable: false,
         });
-        console.log(error.message);
       });
   };
 
@@ -90,7 +96,7 @@ const SignUpPage = () => {
           </Typography>
           <Box
             component="form"
-            noValidate
+            // noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
@@ -154,7 +160,7 @@ const SignUpPage = () => {
                 variant="body2"
                 sx={{ textDecoration: "none" }}
               >
-                {"Sign In"}
+                Sign In
               </Link>
             </Box>
           </Box>

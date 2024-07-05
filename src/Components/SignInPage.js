@@ -12,6 +12,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { toast } from "react-toastify";
 
 const defaultTheme = createTheme();
 
@@ -29,10 +30,27 @@ const SignInPage = () => {
         if (user.emailVerified) {
           navigate("/user");
           localStorage.setItem("status", true);
-        } else console.log("verify email");
+        } else {
+          toast.error("Verfiy mail to continue", {
+            position: "bottom-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+          });
+        }
       })
       .catch((error) => {
         console.log(error.message);
+        toast.error(error.message, {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+        });
       });
   };
 

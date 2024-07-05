@@ -24,12 +24,14 @@ const MapComponent = () => {
     return history ? JSON.parse(history) : [];
   });
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef(null);
   console.log(markerPosition, "test");
+
   useEffect(() => {
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
   }, [searchHistory]);
-  const [inputValue, setInputValue] = useState("");
-  const inputRef = useRef(null);
+
   useEffect(() => {
     console.log("OK");
     navigator.geolocation.getCurrentPosition(
@@ -114,6 +116,9 @@ const MapComponent = () => {
       autocomplete.setFields([]);
     }
   };
+  const handleHistoryItemClick = (description) => {
+    setInputValue(description);
+  };
   if (loadError) {
     return <div>Map cannot be loaded right now, please try again later.</div>;
   }
@@ -148,61 +153,46 @@ const MapComponent = () => {
             onFocus={handleFocus}
             onBlur={handleBlur}
           />
-          <button
-            onClick={handleClearInput}
-            style={{
-              position: "absolute",
-              left: "69%",
-              marginLeft: "-130px",
-              top: "15px",
-              zIndex: "10",
-              height: "25px",
-              border: "none",
-              color: "white",
-              backgroundColor: "blue",
-            }}
-          >
-            clear
-          </button>
         </div>
       </Autocomplete>
       <div
         style={{
           boxSizing: `border-box`,
           border: `1px solid transparent`,
-          width: `48px`,
           height: `32px`,
           padding: `0 12px`,
           borderRadius: `3px`,
           fontSize: `14px`,
           outline: `none`,
-          textOverflow: `ellipsis`,
+          // textOverflow: `ellipsis`,
           position: "absolute",
           left: "50%",
-          marginLeft: "-200px",
-          top: "13px",
+          marginLeft: "-130px",
+          top: "50px",
           zIndex: "10",
         }}
       >
         <button
-          style={{ backgroundColor: "orange", color: "white", padding: "5px" }}
+          style={{
+            marginRight: searchHistory.length > 0 ? "20px" : "130px",
+          }}
           onClick={handleLogOut}
         >
           LogOut
         </button>
+
+        {searchHistory.length > 0 && (
+          <button
+            onClick={toggleHistory}
+            style={{
+              marginRight: "20px",
+            }}
+          >
+            {isHistoryVisible ? "Hide History" : "Show History"}
+          </button>
+        )}
+        <button onClick={handleClearInput}>clear</button>
       </div>
-      <button
-        onClick={toggleHistory}
-        style={{
-          position: "absolute",
-          top: "50px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 10,
-        }}
-      >
-        {isHistoryVisible ? "Hide History" : "Show History"}
-      </button>
       {isHistoryVisible && searchHistory.length > 0 && (
         <div
           className="search-history"
@@ -228,10 +218,14 @@ const MapComponent = () => {
                 padding: "5px 10px",
                 borderBottom: "1px solid #ddd",
               }}
+              onClick={() => handleHistoryItemClick(place.description)}
             >
               <span>{place.description}</span>
               <button
-                onClick={() => handleDeleteHistory(place.description)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteHistory(place.description);
+                }}
                 style={{ marginLeft: "10px" }}
               >
                 Delete
@@ -248,6 +242,11 @@ const MapComponent = () => {
         center={markerPosition}
         zoom={14}
         onLoad={onMapLoad}
+        options={{
+          fullscreenControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+        }}
       >
         <Marker position={markerPosition} />
         {photoUrl && (

@@ -17,6 +17,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { toast } from "react-toastify";
 
 const defaultTheme = createTheme();
 
@@ -40,10 +41,31 @@ const SignUpPage = () => {
             lastName: lName,
           });
         } else console.log("ErrorSignUpPage");
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 3500);
+        toast.success(
+          "Account created successfully and verifying mail has send",
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: false,
+          }
+        );
         sendEmailVerification(user);
-        navigate("/sign-in");
       })
       .catch((error) => {
+        toast.error(error.message, {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+        });
         console.log(error.message);
       });
   };

@@ -8,6 +8,17 @@ import {
   Marker,
   OverlayView,
 } from "@react-google-maps/api";
+import {
+  Box,
+  Paper,
+  InputBase,
+  IconButton,
+  Button,
+  Grid,
+  Divider,
+} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import HistoryIcon from "@mui/icons-material/History";
 
 const MapComponent = () => {
   const [map, setMap] = useState(null);
@@ -94,6 +105,7 @@ const MapComponent = () => {
   };
 
   const handleDeleteHistory = (description) => {
+    if (searchHistory.length === 1) setIsHistoryVisible(false);
     setSearchHistory((prev) =>
       prev.filter((place) => place.description !== description)
     );
@@ -134,116 +146,127 @@ const MapComponent = () => {
 
   return isLoaded ? (
     <div style={{ position: "relative" }}>
-      <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-        <div style={{ position: "relative" }}>
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search places..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            style={{
-              boxSizing: `border-box`,
-              border: `1px solid transparent`,
-              width: `240px`,
-              height: `32px`,
-              padding: `0 12px`,
-              borderRadius: `3px`,
-              boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-              fontSize: `14px`,
-              outline: `none`,
-              textOverflow: `ellipsis`,
-              position: "absolute",
-              left: "50%",
-              marginLeft: "-120px",
-              top: "10px",
-              zIndex: "10",
-            }}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
-        </div>
-      </Autocomplete>
-      <div
-        style={{
-          boxSizing: `border-box`,
-          border: `1px solid transparent`,
-          height: `32px`,
-          padding: `0 12px`,
-          borderRadius: `3px`,
-          fontSize: `14px`,
-          outline: `none`,
-          // textOverflow: `ellipsis`,
+      <Grid
+        container
+        sx={{
+          justifyContent: {
+            xs: "center",
+            sm: "flex-start",
+          },
           position: "absolute",
-          left: "50%",
-          marginLeft: "-130px",
-          top: "50px",
-          zIndex: "10",
+          top: "12.5px",
+          zIndex: 10,
+          marginLeft: { sm: "25px" },
         }}
       >
-        <button
-          style={{
-            marginRight: searchHistory.length > 0 ? "20px" : "130px",
-          }}
-          onClick={handleLogOut}
-        >
-          LogOut
-        </button>
-
-        {searchHistory.length > 0 && (
-          <button
-            onClick={toggleHistory}
-            style={{
-              marginRight: "20px",
-            }}
-          >
-            {isHistoryVisible ? "Hide History" : "Show History"}
-          </button>
-        )}
-        <button onClick={handleClearInput}>clear</button>
-      </div>
-
-      {isHistoryVisible && searchHistory.length > 0 && (
-        <div
-          className="search-history"
-          style={{
-            position: "absolute",
-            top: "80px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 10,
-            background: "white",
-            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)",
-            borderRadius: "3px",
-          }}
-        >
-          {searchHistory.map((place, index) => (
-            <div
-              key={index}
-              className="history-item"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "5px 10px",
-                borderBottom: "1px solid #ddd",
-              }}
-              onClick={() => handleHistoryItemClick(place.description)}
-            >
-              <span>{place.description}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteHistory(place.description);
+        <Grid item xs={10} sm={8} md={6} lg={5}>
+          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+            <Box display={"flex"}>
+              <Paper
+                component="form"
+                sx={{
+                  p: "2px 4px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: 400,
                 }}
-                style={{ marginLeft: "10px" }}
               >
-                Delete
-              </button>
+                {searchHistory.length > 0 ? (
+                  <>
+                    <IconButton sx={{ p: "10px" }} aria-label="menu">
+                      <HistoryIcon
+                        onClick={toggleHistory}
+                        sx={{
+                          backgroundColor: isHistoryVisible ? "lightblue" : "",
+                        }}
+                      />
+                    </IconButton>
+                    <Divider
+                      sx={{ height: 28, m: 0.5 }}
+                      orientation="vertical"
+                    />
+                  </>
+                ) : (
+                  ""
+                )}
+
+                <InputBase
+                  sx={{
+                    ml: 1,
+                    flex: 1,
+                  }}
+                  placeholder="Search Google Maps"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  ref={inputRef}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  inputProps={{ "aria-label": "search google maps" }}
+                />
+                {inputValue ? (
+                  <IconButton
+                    type="button"
+                    sx={{ p: "10px" }}
+                    aria-label="clear"
+                    onClick={handleClearInput}
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                ) : (
+                  ""
+                )}
+              </Paper>
+              <Button
+                variant="contained"
+                onClick={handleLogOut}
+                sx={{ marginLeft: "20px", alignSelf: "center" }}
+                size="small"
+              >
+                LogOut
+              </Button>
+            </Box>
+          </Autocomplete>
+
+          {isHistoryVisible && searchHistory.length > 0 && (
+            <div
+              className="search-history"
+              style={{
+                width: "75%",
+                marginTop: "3px",
+                background: "white",
+                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)",
+                borderRadius: "3px",
+              }}
+            >
+              {searchHistory.map((place, index) => (
+                <div
+                  key={index}
+                  className="history-item"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "5px 10px",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                  onClick={() => handleHistoryItemClick(place.description)}
+                >
+                  <span>{place.description}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteHistory(place.description);
+                    }}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
+        </Grid>
+      </Grid>
 
       <GoogleMap
         mapContainerStyle={{

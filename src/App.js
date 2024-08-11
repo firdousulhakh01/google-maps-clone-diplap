@@ -10,6 +10,7 @@ import SignUpPage from "./Components/SignUpPage";
 import Home from "./Components/Home";
 import UserRoute from "./Components/UserRoute";
 import Maps from "./Components/Maps";
+// import DummyCompo from "./Components/Dummy/DummyCompo";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
               </UserRoute>
             }
           />
+          {/* <Route path="/testing" element={<DummyCompo />} /> */}
         </Routes>
         <ToastContainer />
       </div>
